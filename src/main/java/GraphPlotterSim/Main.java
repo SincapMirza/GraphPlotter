@@ -8,9 +8,10 @@ public class Main {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            //Screen frame = new Screen();
-            SelectionScreenFrame selectionScreenFrame = new SelectionScreenFrame(10);
+            Screen frame = new Screen();
+            SelectionScreenFrame selectionScreenFrame = new SelectionScreenFrame(42);
             selectionScreenFrame.setVisible(true);
+            //frame.setVisible(true);
         });
     }
 
