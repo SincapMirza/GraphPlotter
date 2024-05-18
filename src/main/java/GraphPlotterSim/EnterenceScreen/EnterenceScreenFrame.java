@@ -104,7 +104,7 @@ public class EnterenceScreenFrame extends JFrame {
                     }
                     System.out.println(fileType + filePath);
 
-                    SelectionScreenFrame frame = SelectionScreenFrame.getInstance(20);
+                    SelectionScreenFrame frame = SelectionScreenFrame.getInstance(40);
                     frame.setVisible(true);
                 }
             }

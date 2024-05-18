@@ -246,10 +246,10 @@ public class SelectionScreenFrame extends JFrame {
 
 
     private void updateAxisButtonsVisibility() {
-        boolean graphButtonsVisible = counterX <= 3 && counterY == 1;
+        boolean graphButtonsVisible = (counterX>0 && counterX <= 3) && counterY == 1;
         graphButton1.setVisible(graphButtonsVisible);
         graphButton2.setVisible(graphButtonsVisible);
-        graphButton3.setVisible(counterY == 1);
+        graphButton3.setVisible(counterY == 1 && counterX>=1);
         if(!graphButtonsVisible){
             if(graphButton1.isSelected()){
                 graphButton1.setSelected(false);
@@ -262,7 +262,7 @@ public class SelectionScreenFrame extends JFrame {
                 counterGraph--;
             }
         }
-        if(counterY !=1){
+        if(counterY !=1 ){
             if(graphButton3.isSelected()){
                 graphButton3.setSelected(false);
                 graphButton3.setForeground(Color.BLACK);
@@ -275,6 +275,14 @@ public class SelectionScreenFrame extends JFrame {
         // nextPageButton, counterX, counterY ve counterGraph'in durumuna göre görünür veya görünmez olur
         boolean isVisible = counterGraph >= 1 && counterX >= 1 && counterY >= 1;
         nextPageButton.setVisible(isVisible);
+
+        boolean isVisible2 = counterGraph >= 1 && counterX >= 1;
+
+        if(graphButton4.isSelected()){
+            nextPageButton.setVisible(isVisible2);
+        }
+
+
     }
 
 
