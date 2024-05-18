@@ -1,5 +1,8 @@
 package GraphPlotterSim.SelectionScreen;
 
+import GraphPlotterSim.EnterenceScreen.EnterenceScreenFrame;
+import GraphPlotterSim.GraphScreen.GraphScreenFrame;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.util.Objects;
 
 public class SelectionScreenFrame extends JFrame {
+
+    private static SelectionScreenFrame selectionScreenFrame;
 
     private JToggleButton[] buttons;
     private JToggleButton[] buttons2;
@@ -16,12 +21,15 @@ public class SelectionScreenFrame extends JFrame {
     private int counterX;
     private int counterY;
 
+    private int counterGraph;
+
     private JToggleButton graphButton1;
     private JToggleButton graphButton2;
     private JToggleButton graphButton3;
     private JToggleButton graphButton4;
+    JButton nextPageButton;
 
-    public SelectionScreenFrame(int buttonCount) {
+    private SelectionScreenFrame(int buttonCount) {
         setTitle("Graph Plotter");
         setSize(1300, 800);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -102,8 +110,8 @@ public class SelectionScreenFrame extends JFrame {
         for (int i = 0; i < buttonCount; i++) {
             labels[i] = new JLabel("variable "+(i+1));
 
-            buttons[i] = new JToggleButton("Button X");
-            buttons2[i]= new JToggleButton("Button Y");
+            buttons[i] = new JToggleButton("X-Axis");
+            buttons2[i]= new JToggleButton("Y-Axis");
 
             buttons[i].setBounds(70+locationX,40+locationY,80,32);
             buttons2[i].setBounds(70+locationX,67+locationY,80,32);
@@ -126,7 +134,8 @@ public class SelectionScreenFrame extends JFrame {
                                 buttons2[j].setForeground(Color.BLACK);
                                 counterY--;
                             }
-                            updateGraphButtonsVisibility();
+                            updateAxisButtonsVisibility();
+                            updateGraphsButtonVisibility();
                             break;
                         }
                     }
@@ -150,12 +159,14 @@ public class SelectionScreenFrame extends JFrame {
                                 buttons[j].setForeground(Color.BLACK);
                                 counterX--;
                             }
-                            updateGraphButtonsVisibility();
+                            updateAxisButtonsVisibility();
+                            updateGraphsButtonVisibility();
                             break;
                         }
                     }
                 }
             });
+
 
             locationX+=120;
             if((i+1)%10==0){
@@ -177,6 +188,21 @@ public class SelectionScreenFrame extends JFrame {
         infoLabel.setBounds(425,350,500,40);
         font = infoLabel.getFont();
         infoLabel.setFont(font.deriveFont(font.getSize()+2f));
+
+        nextPageButton = new JButton("Show The Graphs");
+
+        nextPageButton.setBounds(532,305,190,40);
+
+        nextPageButton.setVisible(false);
+
+        nextPageButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GraphScreenFrame.getInstance().setVisible(true);
+            }
+        });
+
+        bottomPanel.add(nextPageButton);
 
         bottomPanel.add(graphButton1);
         bottomPanel.add(graphButton2);
@@ -207,18 +233,59 @@ public class SelectionScreenFrame extends JFrame {
                 if(e.getSource() == jToggleButton){
                     if (jToggleButton.isSelected()) {
                         jToggleButton.setForeground(Color.BLUE);
+                        counterGraph++;
                     } else {
                         jToggleButton.setForeground(Color.BLACK);
+                        counterGraph--;
                     }
+                    updateGraphsButtonVisibility();
                 }
             }
         });
     }
 
-    private void updateGraphButtonsVisibility() {
+
+    private void updateAxisButtonsVisibility() {
         boolean graphButtonsVisible = counterX <= 3 && counterY == 1;
         graphButton1.setVisible(graphButtonsVisible);
         graphButton2.setVisible(graphButtonsVisible);
         graphButton3.setVisible(counterY == 1);
+        if(!graphButtonsVisible){
+            if(graphButton1.isSelected()){
+                graphButton1.setSelected(false);
+                graphButton1.setForeground(Color.BLACK);
+                counterGraph--;
+            }
+            if(graphButton2.isSelected()){
+                graphButton2.setSelected(false);
+                graphButton2.setForeground(Color.BLACK);
+                counterGraph--;
+            }
+        }
+        if(counterY !=1){
+            if(graphButton3.isSelected()){
+                graphButton3.setSelected(false);
+                graphButton3.setForeground(Color.BLACK);
+                counterGraph--;
+            }
+        }
+    }
+
+    private void updateGraphsButtonVisibility() {
+        // nextPageButton, counterX, counterY ve counterGraph'in durumuna göre görünür veya görünmez olur
+        boolean isVisible = counterGraph >= 1 && counterX >= 1 && counterY >= 1;
+        nextPageButton.setVisible(isVisible);
+    }
+
+
+    public static SelectionScreenFrame getInstance(int variable) {
+        if (selectionScreenFrame == null) {
+            synchronized (EnterenceScreenFrame.class) {
+                if (selectionScreenFrame == null) {
+                    selectionScreenFrame = new SelectionScreenFrame(variable);
+                }
+            }
+        }
+        return selectionScreenFrame;
     }
 }

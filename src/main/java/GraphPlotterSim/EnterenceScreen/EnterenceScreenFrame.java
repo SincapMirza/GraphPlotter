@@ -13,9 +13,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
-public class Screen extends JFrame {
+public class EnterenceScreenFrame extends JFrame {
 
-    public Screen() {
+    private static EnterenceScreenFrame enterenceScreenFrame;
+
+    private EnterenceScreenFrame() {
         setTitle("Fixed Size Frame");
         setSize(1300, 800);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -86,7 +88,7 @@ public class Screen extends JFrame {
                 filter = new FileNameExtensionFilter("CSV files (*.csv)", "csv");
                 fileChooser.addChoosableFileFilter(filter); // CSV dosyaları için filtre eklendi
 
-                int result = fileChooser.showOpenDialog(Screen.this);
+                int result = fileChooser.showOpenDialog(EnterenceScreenFrame.this);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     String filePath = selectedFile.getAbsolutePath();
@@ -97,12 +99,12 @@ public class Screen extends JFrame {
                     } else if (filePath.endsWith(".csv")) {
                         fileType = "CSV file: ";
                     }else {
-                        JOptionPane.showMessageDialog(Screen.this, "Unsupported file type. Please select an Excel or CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(EnterenceScreenFrame.this, "Unsupported file type. Please select an Excel or CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
                        // return; // Hata mesajı gösterildikten sonra metodu sonlandır
                     }
                     System.out.println(fileType + filePath);
 
-                    SelectionScreenFrame frame = new SelectionScreenFrame(20);
+                    SelectionScreenFrame frame = SelectionScreenFrame.getInstance(20);
                     frame.setVisible(true);
                 }
             }
@@ -153,6 +155,17 @@ public class Screen extends JFrame {
 
 
         getContentPane().add(mainPanel);
+    }
+
+    public static EnterenceScreenFrame getInstance() {
+        if (enterenceScreenFrame == null) {
+            synchronized (EnterenceScreenFrame.class) {
+                if (enterenceScreenFrame == null) {
+                    enterenceScreenFrame = new EnterenceScreenFrame();
+                }
+            }
+        }
+        return enterenceScreenFrame;
     }
 }
 
