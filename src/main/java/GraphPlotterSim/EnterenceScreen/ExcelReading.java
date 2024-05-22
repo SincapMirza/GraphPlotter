@@ -45,17 +45,18 @@ public class ExcelReading {
             int maxDataRow = cells.getMaxDataRow();
             firstColumnIsString = false;
             for (int i = 1; i <= maxDataRow; i++) {
-                Cell cell = cells.get(i, 0); // İlk sütundaki hücreyi al
-                if (cell.getType() == CellValueType.IS_STRING) {
+                Cell cell2 = cells.get(i, 0); // İlk sütundaki hücreyi al
+                if (cell2.getType() == CellValueType.IS_STRING) {
                     firstColumnIsString = true;
-                    columnHeaders2.add(cell.getStringValue()); // Değeri columnHeaders2 listesine ekle
+                    columnHeaders2.add(cell2.getStringValue()); // Değeri columnHeaders2 listesine ekle
                 }
             }
 
             // Eğer ilk sütun string ise, ilk satırın değerini columnHeaders listesine eklemeyin
-            if (firstColumnIsString) {
-                columnHeaders.removeFirst(); // İlk satırı columnHeaders listesinden kaldır
+            if (firstColumnIsString && !columnHeaders.isEmpty()) {
+                columnHeaders.remove(0); // İlk satırı columnHeaders listesinden kaldır
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,8 +81,8 @@ public class ExcelReading {
             // Veri içeren en son satırın indeksini alın
             int maxDataRow = cells.getMaxDataRow();
 
-           // int j = 0;
-           /* if(firstColumnIsString){
+           /*int j = 0;
+            if(firstColumnIsString){
                 j++;
             }*/
             // Sütun verilerini listelere aktar

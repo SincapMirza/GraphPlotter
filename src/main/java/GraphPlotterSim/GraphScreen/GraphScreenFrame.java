@@ -15,6 +15,7 @@ public class GraphScreenFrame extends JFrame {
     private static GraphScreenFrame graphScreenFrame;
     private JPanel xyGraphPanel;
     private JPanel pieChartPanel;
+    private JPanel scatterPlotPanel;
     JPanel barChartPanel;
 
     private GraphScreenFrame() {
@@ -38,38 +39,47 @@ public class GraphScreenFrame extends JFrame {
 
         JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.CENTER,50,50));
 
-        /*xyGraphPanel = new JPanel(); // Başlangıçta boş bir panel ekleyin
-        xyGraphPanel.setPreferredSize(new Dimension(400, 400));
+        //xyGraphPanel = new JPanel(); // Başlangıçta boş bir panel ekleyin
+        //xyGraphPanel.setPreferredSize(new Dimension(400, 400));
         pieChartPanel = new JPanel();
-        pieChartPanel.setPreferredSize(new Dimension(400,400));*/
+        pieChartPanel.setPreferredSize(new Dimension(400,400));
         barChartPanel = new JPanel();
-        barChartPanel.setPreferredSize(new Dimension(800,600));
+        barChartPanel.setPreferredSize(new Dimension(400,400));
+        /*scatterPlotPanel =  new JPanel();
+        scatterPlotPanel.setPreferredSize(new Dimension(400,400));
 
-        mainPanel.add(barChartPanel);
-        //mainPanel.add(pieChartPanel);
        // mainPanel.add(xyGraphPanel);
+        mainPanel.add(scatterPlotPanel);*/
+        mainPanel.add(barChartPanel);
+        mainPanel.add(pieChartPanel);
 
         add(mainPanel);
     }
 
     public void updateGraph() {
-        /*xyGraphPanel.removeAll(); // Önceki grafiği kaldırın
-        pieChartPanel.removeAll();*/
+        //xyGraphPanel.removeAll(); // Önceki grafiği kaldırın
+        pieChartPanel.removeAll();
         barChartPanel.removeAll();
+        //scatterPlotPanel.removeAll();
 
-       /* GraphXY xyGraph = new GraphXY("XY Graph", SelectionScreenFrame.getInstance().getxData(), SelectionScreenFrame.getInstance().getyData());
-        GraphPie pieChart = new GraphPie("Pie Chart", SelectionScreenFrame.getInstance().getyData());*/
-        GraphBar barGraph = new GraphBar("bar", (List<List<Double>>) SelectionScreenFrame.getInstance().getDataLists());
+       // GraphXY xyGraph = new GraphXY("XY Graph", SelectionScreenFrame.getInstance().getxData(), SelectionScreenFrame.getInstance().getyData());
+        GraphPie pieChart = new GraphPie("Pie Chart", SelectionScreenFrame.getInstance().getDataLists());
+        GraphBar barGraph = new GraphBar("bar", SelectionScreenFrame.getInstance().getDataLists());
+        /*GraphScatterPlot graphScatterPlot = new GraphScatterPlot("scatter",SelectionScreenFrame.getInstance().getDataLists(),true);
+
+        scatterPlotPanel.add(graphScatterPlot.getChartPanel());
+        scatterPlotPanel.revalidate();
+        scatterPlotPanel.repaint();*/
 
         barChartPanel.add(barGraph.getChartPanel());
         barChartPanel.revalidate();
         barChartPanel.repaint();
 
-        /*pieChartPanel.add(pieChart.getChartPanel());
+        pieChartPanel.add(pieChart.getChartPanel());
         pieChartPanel.revalidate();
         pieChartPanel.repaint();
 
-        xyGraphPanel.add(xyGraph.getChartPanel()); // Yeni grafiği ekleyin
+       /* xyGraphPanel.add(xyGraph.getChartPanel()); // Yeni grafiği ekleyin
         xyGraphPanel.revalidate(); // Paneli yeniden doğrulayın
         xyGraphPanel.repaint(); // Paneli yeniden boyayın*/
     }

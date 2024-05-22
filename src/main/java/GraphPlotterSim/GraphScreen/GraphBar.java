@@ -1,5 +1,7 @@
 package GraphPlotterSim.GraphScreen;
 
+import GraphPlotterSim.EnterenceScreen.ExcelReading;
+import GraphPlotterSim.SelectionScreen.SelectionScreenFrame;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -9,6 +11,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GraphBar extends JFrame {
@@ -24,13 +27,40 @@ public class GraphBar extends JFrame {
     private void initUI() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        // Iterate through each row and add its value as a separate bar
-        for (int i = 0; i < dataLists.size(); i++) {
-            List<Double> row = dataLists.get(i);
+        List<String> listOfHeaders = ExcelReading.getInstance().getColumnHeaders2();
+
+        if (dataLists.size() == 1) {
+            // Iterate through each row and add its value as a separate bar
+            List<Double> row = dataLists.get(0); // Get the single list
             for (int j = 0; j < row.size(); j++) {
                 Double value = row.get(j);
+
                 if (value != null && !value.isNaN()) {
-                    dataset.addValue(value, "Row " + (i + 1), "Value " + (j + 1));
+                    if (j < listOfHeaders.size()) {
+                        String header = listOfHeaders.get(j);
+                        dataset.addValue(value, "category", header);
+                    } else {
+                        dataset.addValue(value,"category","Data "+(j+1));
+                    }
+                }
+            }
+        } else {
+            // Sum up the values of each dataset if there are multiple columns selected
+            if(ExcelReading.getInstance().isFirstColumnIsString()){
+                ArrayList<Integer> selectedButtons = SelectionScreenFrame.getInstance().getSelectedAxisButtons();
+                for(int a = 0; a < selectedButtons.size();a++){
+                    selectedButtons.set(a,selectedButtons.get(a)-1);
+                }
+                System.out.println(selectedButtons);
+            for (int i = 0; i < dataLists.size(); i++) {
+                double sum = dataLists.get(i).stream().filter(d -> !d.isNaN()).mapToDouble(Double::doubleValue).sum();
+                String header = ExcelReading.getInstance().getColumnHeaders().get(selectedButtons.get(i));
+                dataset.setValue(sum, "category", header);
+            }}else {
+                for (int i = 0; i < dataLists.size(); i++) {
+                    double sum = dataLists.get(i).stream().filter(d -> !d.isNaN()).mapToDouble(Double::doubleValue).sum();
+                    String header = ExcelReading.getInstance().getColumnHeaders().get(SelectionScreenFrame.getInstance().getSelectedAxisButtons().get(i));
+                    dataset.setValue(sum, "category", header);
                 }
             }
         }
@@ -58,8 +88,12 @@ public class GraphBar extends JFrame {
         plot.getDomainAxis().setLabelPaint(Color.BLACK);
         plot.getRangeAxis().setLabelPaint(Color.BLACK);
 
+
+       plot.getRenderer().setSeriesPaint(0, Color.darkGray);
+
+
         chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(800, 600));
+        chartPanel.setPreferredSize(new Dimension(400, 400));
         setContentPane(chartPanel);
     }
 
@@ -67,5 +101,4 @@ public class GraphBar extends JFrame {
         return chartPanel;
     }
 }
-
 

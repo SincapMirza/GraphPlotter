@@ -320,6 +320,7 @@ public class SelectionScreenFrame extends JFrame {
     }
 
 
+
     public ArrayList<Double> getxData() {
         return xData;
     }
@@ -329,7 +330,6 @@ public class SelectionScreenFrame extends JFrame {
     }
 
     public void updateButtons() {
-        // Yeni Excel verilerini oku
         ExcelReading.getInstance().readExcelData(EnterenceScreenFrame.getInstance().getFilePath());
         int buttonCount = ExcelReading.getInstance().getColumnCount();
 
