@@ -1,13 +1,18 @@
 package GraphPlotterSim.SelectionScreen;
 
 import GraphPlotterSim.EnterenceScreen.EnterenceScreenFrame;
+import GraphPlotterSim.EnterenceScreen.ExcelReading;
 import GraphPlotterSim.GraphScreen.GraphScreenFrame;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.List;
 
 public class SelectionScreenFrame extends JFrame {
 
@@ -28,17 +33,36 @@ public class SelectionScreenFrame extends JFrame {
     private JToggleButton graphButton3;
     private JToggleButton graphButton4;
     JButton nextPageButton;
+    private ArrayList<Double> xData;
+    private ArrayList<Double> yData;
+    private  JPanel upperPanel;
+    private ArrayList<Integer> selectedButtons;
+    private List<List<Double>> dataLists;
 
-    private SelectionScreenFrame(int buttonCount) {
+    private SelectionScreenFrame() {
+
         setTitle("Graph Plotter");
         setSize(1300, 800);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 
+        //ExcelReading.getInstance().readExcelData(EnterenceScreenFrame.getInstance().getFilePath());
+       // buttonCount=ExcelReading.getInstance().getColumnCount();
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                EnterenceScreenFrame.getInstance().setVisible(true);
+                dispose();
+            }
+        });
+
+        EnterenceScreenFrame.getInstance().setVisible(false);
+
         JPanel mainPanel = new JPanel(new GridLayout(2,1));
 
-        JPanel upperPanel = new JPanel();
+        upperPanel = new JPanel();
         upperPanel.setLayout(null);
 
         JPanel bottomPanel = new JPanel();
@@ -98,17 +122,256 @@ public class SelectionScreenFrame extends JFrame {
         graphButton4 = new JToggleButton("Add");
         actionMethod(graphButton4);
 
+
+
+
         graphButton1.setBounds(200,250,80,35);
         graphButton2.setBounds(450,250,80,35);
         graphButton3.setBounds(720,250,80,35);
         graphButton4.setBounds(980,250,80,35);
 
+
+
+        JLabel infoLabel = new JLabel("*\"SGP & RC\" stands for scatter plot graph and regression curve.");
+        infoLabel.setBounds(425,350,500,40);
+        font = infoLabel.getFont();
+        infoLabel.setFont(font.deriveFont(font.getSize()+2f));
+
+        nextPageButton = new JButton("Show The Graphs");
+
+        nextPageButton.setBounds(532,305,190,40);
+
+        nextPageButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                dataLists = ExcelReading.getInstance().readDataContent(EnterenceScreenFrame.getInstance().getFilePath(), SelectionScreenFrame.selectionScreenFrame.getSelectedAxisButtons());
+
+                /*xData = new ArrayList<Double>();
+                yData = new ArrayList<Double>();
+
+                // İlk sütundaki verileri xData listesine ekle
+                if(selectedButtons.size()>=2){
+                for (Object value : ExcelReading.getInstance().getColumnDataLists().get(1)) {
+                    if (value instanceof Double) {
+                        xData.add((Double) value);
+                    } else if (value instanceof String) {
+                        try {
+                            xData.add(Double.parseDouble((String) value));
+                        } catch (NumberFormatException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }}
+
+                // İkinci sütundaki verileri yData listesine ekle
+                for (Object value : ExcelReading.getInstance().getColumnDataLists().get(0)) {
+                    if (value instanceof Double) {
+                        yData.add((Double) value);
+                    } else if (value instanceof String) {
+                        try {
+                            yData.add(Double.parseDouble((String) value));
+                        } catch (NumberFormatException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }*/
+
+                GraphScreenFrame graphScreenFrame = GraphScreenFrame.getInstance();
+                graphScreenFrame.setVisible(true);
+                graphScreenFrame.updateGraph();// GraphScreenFrame gösterildikten sonra grafiği güncelle
+                SelectionScreenFrame.getInstance().setVisible(false); // SelectionScreenFrame'i gizle
+
+
+            }
+        });
+
+        bottomPanel.add(nextPageButton);
+
+        bottomPanel.add(graphButton1);
+        bottomPanel.add(graphButton2);
+        bottomPanel.add(graphButton3);
+        bottomPanel.add(graphButton4);
+
+        bottomPanel.add(graphLabel1);
+        bottomPanel.add(graphLabel2);
+        bottomPanel.add(graphLabel3);
+        bottomPanel.add(graphLabel4);
+
+        bottomPanel.add(imageLabel);
+        bottomPanel.add(imageLabel2);
+        bottomPanel.add(imageLabel3);
+        bottomPanel.add(imageLabel4);
+
+        bottomPanel.add(infoLabel);
+
+        mainPanel.add(upperPanel);
+        mainPanel.add(bottomPanel);
+        add(mainPanel);
+    }
+
+    public void actionMethod(JToggleButton jToggleButton){
+        jToggleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(e.getSource() == jToggleButton){
+                    if (jToggleButton.isSelected()) {
+                        jToggleButton.setForeground(Color.BLUE);
+                        counterGraph++;
+                    } else {
+                        jToggleButton.setForeground(Color.BLACK);
+                        counterGraph--;
+                    }
+                    updateGraphsButtonVisibility();
+                }
+            }
+        });
+    }
+
+
+    private void updateAxisButtonsVisibility() {
+        boolean graphButtonsVisible = (counterX>0 && counterX <= 3) && counterY == 1;
+        graphButton1.setVisible(graphButtonsVisible);
+        graphButton2.setVisible(graphButtonsVisible);
+        graphButton3.setVisible(counterY == 0 && counterX>=1);
+        if(!graphButtonsVisible){
+            if(graphButton1.isSelected()){
+                graphButton1.setSelected(false);
+                graphButton1.setForeground(Color.BLACK);
+                counterGraph--;
+            }
+            if(graphButton2.isSelected()){
+                graphButton2.setSelected(false);
+                graphButton2.setForeground(Color.BLACK);
+                counterGraph--;
+            }
+        }
+        if(counterY != 1 ){
+            if(graphButton3.isSelected()){
+                graphButton3.setSelected(false);
+                graphButton3.setForeground(Color.BLACK);
+                counterGraph--;
+            }
+        }
+        if(counterX+counterY>=1){
+            graphButton4.setVisible(true);
+        }else {
+            graphButton4.setVisible(false);
+        }
+    }
+
+    private void updateGraphsButtonVisibility() {
+        // nextPageButton, counterX, counterY ve counterGraph'in durumuna göre görünür veya görünmez olur
+        boolean isVisible = counterGraph >= 1 && counterX >= 1 && counterY >= 1;
+        nextPageButton.setVisible(isVisible);
+
+        boolean isVisible2 = counterGraph >= 1 && (counterX >= 1 || counterY>=1);
+
+        if(graphButton4.isSelected() || graphButton3.isSelected()){
+            nextPageButton.setVisible(isVisible2);
+        }
+
+
+    }
+
+
+    public static SelectionScreenFrame getInstance() {
+        if (selectionScreenFrame == null) {
+            synchronized (EnterenceScreenFrame.class) {
+                if (selectionScreenFrame == null) {
+                    selectionScreenFrame = new SelectionScreenFrame();
+                }
+            }
+        }
+        return selectionScreenFrame;
+    }
+
+    public ArrayList<Integer> getSelectedAxisButtons() {
+        selectedButtons = new ArrayList<>();
+        Integer firstSelectedButtonFromButtons2 = null;
+
+        int buttonCount = ExcelReading.getInstance().getColumnCount();
+        int j = 0;
+
+        if(ExcelReading.getInstance().isFirstColumnIsString()){
+            buttonCount--;
+            j++;
+        }
+
+        for ( int i = 0; i < buttonCount; i++) {
+            if (buttons2[i].isSelected()) {
+                if (firstSelectedButtonFromButtons2 == null) {
+                    firstSelectedButtonFromButtons2 = i;
+                } else {
+                    selectedButtons.add(j);
+                }
+            } else if (buttons[i].isSelected()) {
+                selectedButtons.add(j);
+            }
+            j++;
+        }
+
+        if (firstSelectedButtonFromButtons2 != null) {
+            selectedButtons.add(0, firstSelectedButtonFromButtons2);
+        }
+
+        return selectedButtons;
+    }
+
+
+    public ArrayList<Double> getxData() {
+        return xData;
+    }
+
+    public ArrayList<Double> getyData() {
+        return yData;
+    }
+
+    public void updateButtons() {
+        // Yeni Excel verilerini oku
+        ExcelReading.getInstance().readExcelData(EnterenceScreenFrame.getInstance().getFilePath());
+        int buttonCount = ExcelReading.getInstance().getColumnCount();
+
+        graphButton1.setVisible(false);
+        graphButton2.setVisible(false);
+        graphButton3.setVisible(false);
+        graphButton4.setVisible(false);
+        nextPageButton.setVisible(false);
+
+        graphButton1.setSelected(false);
+        graphButton2.setSelected(false);
+        graphButton3.setSelected(false);
+        graphButton4.setSelected(false);
+        nextPageButton.setSelected(false);
+
+        graphButton1.setForeground(Color.BLACK);
+        graphButton2.setForeground(Color.BLACK);
+        graphButton3.setForeground(Color.BLACK);
+        graphButton4.setForeground(Color.BLACK);
+
+        counterY=0;
+        counterX=0;
+
+        // Mevcut butonları temizle
+        upperPanel.removeAll();
+        upperPanel.revalidate();
+        upperPanel.repaint();
+
+        // Yeni butonları oluştur
         buttons = new JToggleButton[buttonCount];
         buttons2 = new JToggleButton[buttonCount];
         labels = new JLabel[buttonCount];
 
+        locationX=0;
+        locationY=0;
+
+        if(ExcelReading.getInstance().isFirstColumnIsString()){
+            buttonCount--;//buna bi dikkat et hata verebilir
+        }
+
         for (int i = 0; i < buttonCount; i++) {
-            labels[i] = new JLabel("variable "+(i+1));
+            labels[i] = new JLabel(ExcelReading.getInstance().getColumnHeaders().get(i));
 
             buttons[i] = new JToggleButton("X-Axis");
             buttons2[i]= new JToggleButton("Y-Axis");
@@ -184,116 +447,12 @@ public class SelectionScreenFrame extends JFrame {
             }
         }
 
-        JLabel infoLabel = new JLabel("*\"SGP & RC\" stands for scatter plot graph and regression curve.");
-        infoLabel.setBounds(425,350,500,40);
-        font = infoLabel.getFont();
-        infoLabel.setFont(font.deriveFont(font.getSize()+2f));
-
-        nextPageButton = new JButton("Show The Graphs");
-
-        nextPageButton.setBounds(532,305,190,40);
-
-        nextPageButton.setVisible(false);
-
-        nextPageButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GraphScreenFrame.getInstance().setVisible(true);
-            }
-        });
-
-        bottomPanel.add(nextPageButton);
-
-        bottomPanel.add(graphButton1);
-        bottomPanel.add(graphButton2);
-        bottomPanel.add(graphButton3);
-        bottomPanel.add(graphButton4);
-
-        bottomPanel.add(graphLabel1);
-        bottomPanel.add(graphLabel2);
-        bottomPanel.add(graphLabel3);
-        bottomPanel.add(graphLabel4);
-
-        bottomPanel.add(imageLabel);
-        bottomPanel.add(imageLabel2);
-        bottomPanel.add(imageLabel3);
-        bottomPanel.add(imageLabel4);
-
-        bottomPanel.add(infoLabel);
-
-        mainPanel.add(upperPanel);
-        mainPanel.add(bottomPanel);
-        add(mainPanel);
+        // Paneli yeniden boyutlandır
+        upperPanel.revalidate();
+        upperPanel.repaint();
     }
 
-    public void actionMethod(JToggleButton jToggleButton){
-        jToggleButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(e.getSource() == jToggleButton){
-                    if (jToggleButton.isSelected()) {
-                        jToggleButton.setForeground(Color.BLUE);
-                        counterGraph++;
-                    } else {
-                        jToggleButton.setForeground(Color.BLACK);
-                        counterGraph--;
-                    }
-                    updateGraphsButtonVisibility();
-                }
-            }
-        });
-    }
-
-
-    private void updateAxisButtonsVisibility() {
-        boolean graphButtonsVisible = (counterX>0 && counterX <= 3) && counterY == 1;
-        graphButton1.setVisible(graphButtonsVisible);
-        graphButton2.setVisible(graphButtonsVisible);
-        graphButton3.setVisible(counterY == 1 && counterX>=1);
-        if(!graphButtonsVisible){
-            if(graphButton1.isSelected()){
-                graphButton1.setSelected(false);
-                graphButton1.setForeground(Color.BLACK);
-                counterGraph--;
-            }
-            if(graphButton2.isSelected()){
-                graphButton2.setSelected(false);
-                graphButton2.setForeground(Color.BLACK);
-                counterGraph--;
-            }
-        }
-        if(counterY !=1 ){
-            if(graphButton3.isSelected()){
-                graphButton3.setSelected(false);
-                graphButton3.setForeground(Color.BLACK);
-                counterGraph--;
-            }
-        }
-    }
-
-    private void updateGraphsButtonVisibility() {
-        // nextPageButton, counterX, counterY ve counterGraph'in durumuna göre görünür veya görünmez olur
-        boolean isVisible = counterGraph >= 1 && counterX >= 1 && counterY >= 1;
-        nextPageButton.setVisible(isVisible);
-
-        boolean isVisible2 = counterGraph >= 1 && counterX >= 1;
-
-        if(graphButton4.isSelected()){
-            nextPageButton.setVisible(isVisible2);
-        }
-
-
-    }
-
-
-    public static SelectionScreenFrame getInstance(int variable) {
-        if (selectionScreenFrame == null) {
-            synchronized (EnterenceScreenFrame.class) {
-                if (selectionScreenFrame == null) {
-                    selectionScreenFrame = new SelectionScreenFrame(variable);
-                }
-            }
-        }
-        return selectionScreenFrame;
+    public List<List<Double>> getDataLists() {
+        return dataLists;
     }
 }

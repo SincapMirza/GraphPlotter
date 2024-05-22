@@ -15,12 +15,16 @@ import java.io.File;
 
 public class EnterenceScreenFrame extends JFrame {
 
+    private String filePath;
+
     private static EnterenceScreenFrame enterenceScreenFrame;
 
     private EnterenceScreenFrame() {
         setTitle("Fixed Size Frame");
         setSize(1300, 800);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
         //setResizable(false); // Pencere boyutunu değiştirmeyi devre dışı bırakır
 
         // "Welcome To Graph Plotter" yazısı
@@ -91,24 +95,28 @@ public class EnterenceScreenFrame extends JFrame {
                 int result = fileChooser.showOpenDialog(EnterenceScreenFrame.this);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    String filePath = selectedFile.getAbsolutePath();
+                    filePath = selectedFile.getAbsolutePath();
                     // Dosya türüne göre farklı mesajlar yazdırma
                     String fileType = "";
                     if (filePath.endsWith(".xls") || filePath.endsWith(".xlsx")) {
                         fileType = "Excel file: ";
                     } else if (filePath.endsWith(".csv")) {
                         fileType = "CSV file: ";
-                    }else {
+                    } else {
                         JOptionPane.showMessageDialog(EnterenceScreenFrame.this, "Unsupported file type. Please select an Excel or CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
-                       // return; // Hata mesajı gösterildikten sonra metodu sonlandır
+                        return; // Hata mesajı gösterildikten sonra metodu sonlandır
                     }
                     System.out.println(fileType + filePath);
 
-                    SelectionScreenFrame frame = SelectionScreenFrame.getInstance(40);
+                    SelectionScreenFrame frame = SelectionScreenFrame.getInstance();
                     frame.setVisible(true);
+
+                    // Yeni bir dosya seçildiğinde, SelectionScreenFrame'deki butonları güncelle
+                    frame.updateButtons();
                 }
             }
         });
+
 
 
         fileButton.setPreferredSize(new Dimension(200, 60));
@@ -166,6 +174,13 @@ public class EnterenceScreenFrame extends JFrame {
             }
         }
         return enterenceScreenFrame;
+    }
+    public String getFilePath(){
+        if(filePath != null){
+            return filePath;
+        }else {
+            return null;
+        }
     }
 }
 
