@@ -1,13 +1,12 @@
 package GraphPlotterSim.GraphScreen;
 
-import GraphPlotterSim.EnterenceScreen.EnterenceScreenFrame;
-import GraphPlotterSim.EnterenceScreen.ExcelReading;
 import GraphPlotterSim.SelectionScreen.SelectionScreenFrame;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GraphScreenFrame extends JFrame {
@@ -16,7 +15,12 @@ public class GraphScreenFrame extends JFrame {
     private JPanel xyGraphPanel;
     private JPanel pieChartPanel;
     private JPanel scatterPlotPanel;
-    JPanel barChartPanel;
+    private JPanel barChartPanel;
+    private List<JPanel> graphPanels;
+    private GraphXY xyGraph;
+    private GraphScatterPlot scatterPlot;
+    private GraphBar barGraph;
+    private GraphPie pieChart;
 
     private GraphScreenFrame() {
         initUI();
@@ -24,64 +28,105 @@ public class GraphScreenFrame extends JFrame {
 
     private void initUI() {
         setTitle("Graph Plotter");
-        setSize(1300, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true);
 
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                SelectionScreenFrame.getInstance().setVisible(true); // Singleton SelectionScreenFrame'i görünür yap
+                SelectionScreenFrame.getInstance().secondUpdateButtons();
+                SelectionScreenFrame.getInstance().setVisible(true);
                 dispose();
             }
         });
 
-        JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.CENTER,50,50));
 
-        //xyGraphPanel = new JPanel(); // Başlangıçta boş bir panel ekleyin
-        //xyGraphPanel.setPreferredSize(new Dimension(400, 400));
+
+        xyGraphPanel = new JPanel();
         pieChartPanel = new JPanel();
-        pieChartPanel.setPreferredSize(new Dimension(400,400));
+        scatterPlotPanel = new JPanel();
         barChartPanel = new JPanel();
-        barChartPanel.setPreferredSize(new Dimension(400,400));
-        /*scatterPlotPanel =  new JPanel();
-        scatterPlotPanel.setPreferredSize(new Dimension(400,400));
 
-       // mainPanel.add(xyGraphPanel);
-        mainPanel.add(scatterPlotPanel);*/
-        mainPanel.add(barChartPanel);
-        mainPanel.add(pieChartPanel);
 
-        add(mainPanel);
+        graphPanels = new ArrayList<>();
+        graphPanels.add(xyGraphPanel);
+        graphPanels.add(pieChartPanel);
+        graphPanels.add(scatterPlotPanel);
+        graphPanels.add(barChartPanel);
+
+    }
+
+    private void setGridLayout(int rows, int cols) {
+        setLayout(new GridLayout(rows, cols, 50, 0));
     }
 
     public void updateGraph() {
-        //xyGraphPanel.removeAll(); // Önceki grafiği kaldırın
+        xyGraphPanel.removeAll();
         pieChartPanel.removeAll();
+        scatterPlotPanel.removeAll();
         barChartPanel.removeAll();
-        //scatterPlotPanel.removeAll();
 
-       // GraphXY xyGraph = new GraphXY("XY Graph", SelectionScreenFrame.getInstance().getxData(), SelectionScreenFrame.getInstance().getyData());
-        GraphPie pieChart = new GraphPie("Pie Chart", SelectionScreenFrame.getInstance().getDataLists());
-        GraphBar barGraph = new GraphBar("bar", SelectionScreenFrame.getInstance().getDataLists());
-        /*GraphScatterPlot graphScatterPlot = new GraphScatterPlot("scatter",SelectionScreenFrame.getInstance().getDataLists(),true);
+        List<JPanel> selectedPanels = new ArrayList<>();
 
-        scatterPlotPanel.add(graphScatterPlot.getChartPanel());
-        scatterPlotPanel.revalidate();
-        scatterPlotPanel.repaint();*/
+        if (SelectionScreenFrame.getInstance().getGraphButton1().isSelected()) {
 
-        barChartPanel.add(barGraph.getChartPanel());
-        barChartPanel.revalidate();
-        barChartPanel.repaint();
+            xyGraph = new GraphXY("XY Graph", SelectionScreenFrame.getInstance().getDataLists(),1,0);
+            xyGraphPanel.add(xyGraph.getChartPanel());
+            selectedPanels.add(xyGraphPanel);
+        }
 
-        pieChartPanel.add(pieChart.getChartPanel());
-        pieChartPanel.revalidate();
-        pieChartPanel.repaint();
+        if (SelectionScreenFrame.getInstance().getGraphButton2().isSelected()) {
+            scatterPlot = new GraphScatterPlot("Scatter Plot", SelectionScreenFrame.getInstance().getDataLists(), true);
+            scatterPlotPanel.add(scatterPlot.getChartPanel());
+            selectedPanels.add(scatterPlotPanel);
+        }
 
-       /* xyGraphPanel.add(xyGraph.getChartPanel()); // Yeni grafiği ekleyin
-        xyGraphPanel.revalidate(); // Paneli yeniden doğrulayın
-        xyGraphPanel.repaint(); // Paneli yeniden boyayın*/
+        if (SelectionScreenFrame.getInstance().getGraphButton3().isSelected()) {
+            barGraph = new GraphBar("Bar Graph", SelectionScreenFrame.getInstance().getDataLists());
+            barChartPanel.add(barGraph.getChartPanel());
+            selectedPanels.add(barChartPanel);
+        }
+
+        if (SelectionScreenFrame.getInstance().getGraphButton4().isSelected()) {
+            pieChart = new GraphPie("Pie Chart", SelectionScreenFrame.getInstance().getDataLists());
+            pieChartPanel.add(pieChart.getChartPanel());
+            selectedPanels.add(pieChartPanel);
+        }
+
+        getContentPane().removeAll();
+        int panelCount = selectedPanels.size();
+
+        if (panelCount == 1) {
+            setGridLayout(1, 1);
+            setPanelSize(selectedPanels.get(0), 500, 500);
+        } else if (panelCount == 2) {
+            setGridLayout(1, 2);
+            setPanelSize(selectedPanels.get(0), 500, 500);
+            setPanelSize(selectedPanels.get(1), 500, 500);
+
+        } else if (panelCount == 3 || panelCount == 4) {
+            setGridLayout(2, 2);
+            for (JPanel panel : selectedPanels) {
+                setPanelSize(panel, 500, 500);
+            }
+        }
+
+        for (JPanel panel : selectedPanels) {
+            getContentPane().add(panel);
+        }
+
+        revalidate();
+        repaint();
+
+    }
+
+    private void setPanelSize(JPanel panel, int width, int height) {
+        panel.setPreferredSize(new Dimension(width, height));
+        panel.setMaximumSize(new Dimension(width, height));
+        panel.setMinimumSize(new Dimension(width, height));
+        panel.setSize(new Dimension(width, height));
     }
 
     public static GraphScreenFrame getInstance() {

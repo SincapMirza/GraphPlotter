@@ -32,12 +32,13 @@ public class SelectionScreenFrame extends JFrame {
     private JToggleButton graphButton2;
     private JToggleButton graphButton3;
     private JToggleButton graphButton4;
-    JButton nextPageButton;
+    private JButton nextPageButton;
     private ArrayList<Double> xData;
     private ArrayList<Double> yData;
     private  JPanel upperPanel;
     private ArrayList<Integer> selectedButtons;
     private List<List<Double>> dataLists;
+    private JToggleButton selectAllButtons;
 
     private SelectionScreenFrame() {
 
@@ -141,51 +142,20 @@ public class SelectionScreenFrame extends JFrame {
 
         nextPageButton.setBounds(532,305,190,40);
 
+        // nextPageButton için ActionListener içinde
         nextPageButton.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 dataLists = ExcelReading.getInstance().readDataContent(EnterenceScreenFrame.getInstance().getFilePath(), SelectionScreenFrame.selectionScreenFrame.getSelectedAxisButtons());
 
-                /*xData = new ArrayList<Double>();
-                yData = new ArrayList<Double>();
-
-                // İlk sütundaki verileri xData listesine ekle
-                if(selectedButtons.size()>=2){
-                for (Object value : ExcelReading.getInstance().getColumnDataLists().get(1)) {
-                    if (value instanceof Double) {
-                        xData.add((Double) value);
-                    } else if (value instanceof String) {
-                        try {
-                            xData.add(Double.parseDouble((String) value));
-                        } catch (NumberFormatException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }}
-
-                // İkinci sütundaki verileri yData listesine ekle
-                for (Object value : ExcelReading.getInstance().getColumnDataLists().get(0)) {
-                    if (value instanceof Double) {
-                        yData.add((Double) value);
-                    } else if (value instanceof String) {
-                        try {
-                            yData.add(Double.parseDouble((String) value));
-                        } catch (NumberFormatException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }*/
-
                 GraphScreenFrame graphScreenFrame = GraphScreenFrame.getInstance();
+                graphScreenFrame.updateGraph();
                 graphScreenFrame.setVisible(true);
-                graphScreenFrame.updateGraph();// GraphScreenFrame gösterildikten sonra grafiği güncelle
-                SelectionScreenFrame.getInstance().setVisible(false); // SelectionScreenFrame'i gizle
 
-
+                SelectionScreenFrame.getInstance().setVisible(false);
             }
         });
+
 
         bottomPanel.add(nextPageButton);
 
@@ -231,49 +201,51 @@ public class SelectionScreenFrame extends JFrame {
 
 
     private void updateAxisButtonsVisibility() {
-        boolean graphButtonsVisible = (counterX>0 && counterX <= 3) && counterY == 1;
-        graphButton1.setVisible(graphButtonsVisible);
-        graphButton2.setVisible(graphButtonsVisible);
-        graphButton3.setVisible(counterY == 0 && counterX>=1);
-        if(!graphButtonsVisible){
-            if(graphButton1.isSelected()){
-                graphButton1.setSelected(false);
-                graphButton1.setForeground(Color.BLACK);
-                counterGraph--;
-            }
-            if(graphButton2.isSelected()){
-                graphButton2.setSelected(false);
-                graphButton2.setForeground(Color.BLACK);
-                counterGraph--;
-            }
+        // graphButton3 görünürlüğü: counterY 0 olacak ve counterX en az 1 olacak
+        graphButton3.setVisible(counterY == 0 && counterX >= 1);
+
+        // graphButton4 görünürlüğü: counterX veya counterY en az 1 olacak
+        graphButton4.setVisible(counterX >= 1 || counterY >= 1);
+
+        // graphButton1 görünürlüğü: sadece counterX 1 ve counterY 1 olacak
+        graphButton1.setVisible(counterX == 1 && counterY == 1);
+
+        // graphButton2 görünürlüğü: counterY 0 olacak ve counterX en az 1, en fazla 3 olacak
+        graphButton2.setVisible(counterY == 0 && counterX >= 1 && counterX <= 3);
+
+        // graphButton1 ve graphButton2 için butonlar seçiliyse işlem yapma
+        if (!graphButton1.isVisible() && graphButton1.isSelected()) {
+            graphButton1.setSelected(false);
+            graphButton1.setForeground(Color.BLACK);
+            counterGraph--;
         }
-        if(counterY != 1 ){
-            if(graphButton3.isSelected()){
-                graphButton3.setSelected(false);
-                graphButton3.setForeground(Color.BLACK);
-                counterGraph--;
-            }
+        if (!graphButton2.isVisible() && graphButton2.isSelected()) {
+            graphButton2.setSelected(false);
+            graphButton2.setForeground(Color.BLACK);
+            counterGraph--;
         }
-        if(counterX+counterY>=1){
-            graphButton4.setVisible(true);
-        }else {
-            graphButton4.setVisible(false);
+
+        // counterY 1 değilse ve graphButton3 seçiliyse işlem yapma
+        if (counterY != 1 && graphButton3.isSelected()) {
+            graphButton3.setSelected(false);
+            graphButton3.setForeground(Color.BLACK);
+            counterGraph--;
         }
     }
+
 
     private void updateGraphsButtonVisibility() {
-        // nextPageButton, counterX, counterY ve counterGraph'in durumuna göre görünür veya görünmez olur
-        boolean isVisible = counterGraph >= 1 && counterX >= 1 && counterY >= 1;
+        // counterGraph 1 veya 1'den büyükse nextPageButton görünür olacak
+        boolean isVisible = counterGraph >= 1;
         nextPageButton.setVisible(isVisible);
 
-        boolean isVisible2 = counterGraph >= 1 && (counterX >= 1 || counterY>=1);
-
-        if(graphButton4.isSelected() || graphButton3.isSelected()){
-            nextPageButton.setVisible(isVisible2);
+        // Eğer nextPageButton görünür değilse, metin rengini siyah yap
+        if (!isVisible && nextPageButton.isSelected()) {
+            nextPageButton.setSelected(false);
+            nextPageButton.setForeground(Color.BLACK);
         }
-
-
     }
+
 
 
     public static SelectionScreenFrame getInstance() {
@@ -300,7 +272,7 @@ public class SelectionScreenFrame extends JFrame {
         }
 
         for ( int i = 0; i < buttonCount; i++) {
-            if (buttons2[i].isSelected()) {
+            if (buttons2[i].isSelected() && buttons2[i] != null) {
                 if (firstSelectedButtonFromButtons2 == null) {
                     firstSelectedButtonFromButtons2 = i;
                 } else {
@@ -377,7 +349,7 @@ public class SelectionScreenFrame extends JFrame {
             buttons2[i]= new JToggleButton("Y-Axis");
 
             buttons[i].setBounds(70+locationX,40+locationY,80,32);
-            buttons2[i].setBounds(70+locationX,67+locationY,80,32);
+            buttons2[i].setBounds(70+locationX,68+locationY,80,32);
             labels[i].setBounds(78+locationX,18+locationY,80,32);
 
             buttons[i].addActionListener(new ActionListener() {
@@ -437,15 +409,58 @@ public class SelectionScreenFrame extends JFrame {
                 locationX=0;
             }
 
+
             upperPanel.add(buttons[i]);
             upperPanel.add(buttons2[i]);
             upperPanel.add(labels[i]);
 
-            if(i==39){
+            if(i==38){
                 System.out.println("sınıra ulaşıldı");
                 break;
             }
         }
+
+        selectAllButtons = new JToggleButton("Select All");
+        selectAllButtons.setBounds(1150, 320, 80, 40);
+        selectAllButtons.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(selectAllButtons.isSelected()) {
+                    selectAllButtons.setForeground(Color.BLUE);
+                    for (int i = 0; i < buttons.length; i++) {
+                        if (buttons[i] != null && !buttons[i].isSelected()) {
+                            buttons[i].setSelected(true);
+                            buttons[i].setForeground(Color.BLUE);
+                            if (buttons2[i].isSelected()) {
+                                buttons2[i].setForeground(Color.BLACK);
+                                buttons2[i].setSelected(false);
+                                counterY--;
+                            }
+                            counterX++;
+                        }
+                    }
+                }else if (!selectAllButtons.isSelected()){
+                    selectAllButtons.setForeground(Color.BLACK);
+                    for (int i = 0; i < buttons.length; i++) {
+                        if (buttons[i] != null && buttons[i].isSelected()) {
+                            buttons[i].setSelected(false);
+                            buttons[i].setForeground(Color.BLACK);
+                            if (buttons2[i].isSelected()) {
+                                buttons2[i].setForeground(Color.BLACK);
+                                buttons2[i].setSelected(false);
+                                counterY--;
+                            }
+                            counterX--;
+                        }
+                    }
+                }
+                updateAxisButtonsVisibility();
+                updateGraphsButtonVisibility();
+            }
+        });
+
+        upperPanel.add(selectAllButtons);
+
 
         // Paneli yeniden boyutlandır
         upperPanel.revalidate();
@@ -454,5 +469,61 @@ public class SelectionScreenFrame extends JFrame {
 
     public List<List<Double>> getDataLists() {
         return dataLists;
+    }
+    public void secondUpdateButtons(){
+
+        for(int i = 0; i < buttons.length; i++){
+            if(buttons[i] != null){
+            buttons[i].setSelected(false);
+            buttons[i].setForeground(Color.BLACK);}
+            if(buttons2[i] != null){
+                buttons2[i].setSelected(false);
+                buttons2[i].setForeground(Color.BLACK);}
+
+        }
+
+        selectAllButtons.setForeground(Color.BLACK);
+        selectAllButtons.setSelected(false);
+
+        graphButton1.setVisible(false);
+        graphButton2.setVisible(false);
+        graphButton3.setVisible(false);
+        graphButton4.setVisible(false);
+        nextPageButton.setVisible(false);
+
+        graphButton1.setSelected(false);
+        graphButton2.setSelected(false);
+        graphButton3.setSelected(false);
+        graphButton4.setSelected(false);
+        nextPageButton.setSelected(false);
+
+        graphButton1.setForeground(Color.BLACK);
+        graphButton2.setForeground(Color.BLACK);
+        graphButton3.setForeground(Color.BLACK);
+        graphButton4.setForeground(Color.BLACK);
+
+        counterY=0;
+        counterX=0;
+        counterGraph = 0;
+    }
+
+    public static SelectionScreenFrame getSelectionScreenFrame() {
+        return selectionScreenFrame;
+    }
+
+    public JToggleButton getGraphButton1() {
+        return graphButton1;
+    }
+
+    public JToggleButton getGraphButton2() {
+        return graphButton2;
+    }
+
+    public JToggleButton getGraphButton3() {
+        return graphButton3;
+    }
+
+    public JToggleButton getGraphButton4() {
+        return graphButton4;
     }
 }

@@ -97,7 +97,7 @@ public class GraphPie extends JFrame {
         plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0} ({2})",new DecimalFormat("0"),new DecimalFormat("0.00%")));
 
         chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(400, 400));
+        chartPanel.setPreferredSize(new Dimension(700, 400));
     }
 
     public ChartPanel getChartPanel() {
