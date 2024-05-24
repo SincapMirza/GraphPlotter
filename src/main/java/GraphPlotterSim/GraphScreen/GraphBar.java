@@ -93,7 +93,7 @@ public class GraphBar extends JFrame {
 
 
         chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(700, 400));
+        //chartPanel.setPreferredSize(new Dimension(700, 400));
         setContentPane(chartPanel);
     }
 

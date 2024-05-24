@@ -6,10 +6,7 @@ import GraphPlotterSim.GraphScreen.GraphScreenFrame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.List;
@@ -39,6 +36,8 @@ public class SelectionScreenFrame extends JFrame {
     private ArrayList<Integer> selectedButtons;
     private List<List<Double>> dataLists;
     private JToggleButton selectAllButtons;
+    private String email;
+    private JCheckBox checkBox;
 
     private SelectionScreenFrame() {
 
@@ -156,6 +155,67 @@ public class SelectionScreenFrame extends JFrame {
             }
         });
 
+
+        JLabel emailLabel = new JLabel("Send e-mail");
+        emailLabel.setBounds(1150,310,100,35);
+
+        checkBox = new JCheckBox();
+        checkBox.setBounds(1225,310,35,35);
+
+        checkBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (checkBox.isSelected()) {
+                    JDialog emailDialog = new JDialog(SelectionScreenFrame.getSelectionScreenFrame(),"Enter Email", true);
+                    emailDialog.setLayout(new FlowLayout());
+                    emailDialog.setSize(300, 150);
+                    emailDialog.setLocationRelativeTo(SelectionScreenFrame.getSelectionScreenFrame());
+                    emailDialog.setResizable(false);
+
+                    JLabel emailPopupLabel = new JLabel("Enter your email:");
+                    JTextField emailTextField = new JTextField(20);
+                    JButton submitButton = new JButton("Submit");
+
+                    submitButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            email = emailTextField.getText();
+                            if (isValidEmail(email)) {
+                                System.out.println("Email submitted: " + email);
+                                emailDialog.dispose();
+                            } else {
+                                JOptionPane.showMessageDialog(emailDialog, "Invalid email format.", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    });
+
+                    emailDialog.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosing(WindowEvent e) {
+                            if (checkBox.isSelected()) {
+                                checkBox.setSelected(false); // CheckBox seçiliyse seçimini kaldır
+                            }
+                        }
+                    });
+
+
+                    emailDialog.add(emailPopupLabel);
+                    emailDialog.add(emailTextField);
+                    emailDialog.add(submitButton);
+
+                    emailDialog.setVisible(true);
+                }
+            }
+
+            private boolean isValidEmail(String email) {
+                String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+                return email.matches(emailRegex);
+            }
+
+        });
+
+        bottomPanel.add(checkBox);
+        bottomPanel.add(emailLabel);
 
         bottomPanel.add(nextPageButton);
 
@@ -460,8 +520,6 @@ public class SelectionScreenFrame extends JFrame {
         });
 
         upperPanel.add(selectAllButtons);
-
-
         // Paneli yeniden boyutlandır
         upperPanel.revalidate();
         upperPanel.repaint();
@@ -525,5 +583,13 @@ public class SelectionScreenFrame extends JFrame {
 
     public JToggleButton getGraphButton4() {
         return graphButton4;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public JCheckBox getCheckBox() {
+        return checkBox;
     }
 }

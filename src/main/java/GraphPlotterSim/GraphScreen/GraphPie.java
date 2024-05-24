@@ -94,10 +94,12 @@ public class GraphPie extends JFrame {
             plot.setSectionPaint("Data " + (i + 1), colors[i % colors.length]);
         }
 
-        plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0} ({2})",new DecimalFormat("0"),new DecimalFormat("0.00%")));
+        plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0} ({2} - {1})", new DecimalFormat("0"), new DecimalFormat("0.00%")));
+
+
 
         chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(700, 400));
+        //chartPanel.setPreferredSize(new Dimension(700, 400));
     }
 
     public ChartPanel getChartPanel() {

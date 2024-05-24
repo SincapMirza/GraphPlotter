@@ -2,12 +2,23 @@ package GraphPlotterSim.GraphScreen;
 
 import GraphPlotterSim.SelectionScreen.SelectionScreenFrame;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import jakarta.activation.*;
+import java.io.*;
+import java.util.*;
 
 public class GraphScreenFrame extends JFrame {
 
@@ -42,24 +53,20 @@ public class GraphScreenFrame extends JFrame {
             }
         });
 
-
-
         xyGraphPanel = new JPanel();
         pieChartPanel = new JPanel();
         scatterPlotPanel = new JPanel();
         barChartPanel = new JPanel();
-
 
         graphPanels = new ArrayList<>();
         graphPanels.add(xyGraphPanel);
         graphPanels.add(pieChartPanel);
         graphPanels.add(scatterPlotPanel);
         graphPanels.add(barChartPanel);
-
     }
 
     private void setGridLayout(int rows, int cols) {
-        setLayout(new GridLayout(rows, cols, 50, 0));
+        setLayout(new GridLayout(rows, cols, 10, 10));
     }
 
     public void updateGraph() {
@@ -71,8 +78,7 @@ public class GraphScreenFrame extends JFrame {
         List<JPanel> selectedPanels = new ArrayList<>();
 
         if (SelectionScreenFrame.getInstance().getGraphButton1().isSelected()) {
-
-            xyGraph = new GraphXY("XY Graph", SelectionScreenFrame.getInstance().getDataLists(),1,0);
+            xyGraph = new GraphXY("XY Graph", SelectionScreenFrame.getInstance().getDataLists(), 1, 0);
             xyGraphPanel.add(xyGraph.getChartPanel());
             selectedPanels.add(xyGraphPanel);
         }
@@ -100,16 +106,15 @@ public class GraphScreenFrame extends JFrame {
 
         if (panelCount == 1) {
             setGridLayout(1, 1);
-            setPanelSize(selectedPanels.get(0), 500, 500);
+            setPanelSize(selectedPanels.get(0), 1300, 800);
         } else if (panelCount == 2) {
             setGridLayout(1, 2);
-            setPanelSize(selectedPanels.get(0), 500, 500);
-            setPanelSize(selectedPanels.get(1), 500, 500);
-
+            setPanelSize(selectedPanels.get(0), 740, 800);
+            setPanelSize(selectedPanels.get(1), 740, 800);
         } else if (panelCount == 3 || panelCount == 4) {
             setGridLayout(2, 2);
             for (JPanel panel : selectedPanels) {
-                setPanelSize(panel, 500, 500);
+                setPanelSize(panel, 740, 400);
             }
         }
 
@@ -120,6 +125,11 @@ public class GraphScreenFrame extends JFrame {
         revalidate();
         repaint();
 
+        if (SelectionScreenFrame.getInstance().getEmail() != null && SelectionScreenFrame.getInstance().getCheckBox().isSelected()) {
+            EmailSenderThread emailSenderThread = new EmailSenderThread(SelectionScreenFrame.getInstance().getEmail(), "M&M Graph Plotter plotted graphs", "Your graphs:", selectedPanels);
+            emailSenderThread.start();
+        }
+
     }
 
     private void setPanelSize(JPanel panel, int width, int height) {
@@ -127,6 +137,14 @@ public class GraphScreenFrame extends JFrame {
         panel.setMaximumSize(new Dimension(width, height));
         panel.setMinimumSize(new Dimension(width, height));
         panel.setSize(new Dimension(width, height));
+
+        if (panel.getComponentCount() > 0 && panel.getComponent(0) instanceof JPanel) {
+            JPanel innerPanel = (JPanel) panel.getComponent(0);
+            innerPanel.setPreferredSize(new Dimension(width, height));
+            innerPanel.setMaximumSize(new Dimension(width, height));
+            innerPanel.setMinimumSize(new Dimension(width, height));
+            innerPanel.setSize(new Dimension(width, height));
+        }
     }
 
     public static GraphScreenFrame getInstance() {
@@ -139,4 +157,6 @@ public class GraphScreenFrame extends JFrame {
         }
         return graphScreenFrame;
     }
+
+
 }

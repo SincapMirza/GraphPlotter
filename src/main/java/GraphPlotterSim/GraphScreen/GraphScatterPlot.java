@@ -80,7 +80,7 @@ public class GraphScatterPlot extends JFrame {
         plot.setRangeGridlinePaint(Color.GRAY);
 
         chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(700, 400));
+       // chartPanel.setPreferredSize(new Dimension(700, 400));
 
         getContentPane().add(chartPanel);
     }

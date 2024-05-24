@@ -95,7 +95,7 @@ public class GraphXY extends JFrame {
 
         // Create and add the chart panel
         chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(700, 400));
+        //chartPanel.setPreferredSize(new Dimension(700, 400));
         getContentPane().add(chartPanel);
     }
 
