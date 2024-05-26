@@ -102,6 +102,7 @@ public class EnterenceScreenFrame extends JFrame {
                         fileType = "Excel file: ";
                     } else if (filePath.endsWith(".csv")) {
                         fileType = "CSV file: ";
+                        System.out.println("sa");
                     } else {
                         JOptionPane.showMessageDialog(EnterenceScreenFrame.this, "Unsupported file type. Please select an Excel or CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
                         return; // Hata mesajı gösterildikten sonra metodu sonlandır
