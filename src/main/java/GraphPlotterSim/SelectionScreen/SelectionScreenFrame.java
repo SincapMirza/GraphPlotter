@@ -30,8 +30,6 @@ public class SelectionScreenFrame extends JFrame {
     private JToggleButton graphButton3;
     private JToggleButton graphButton4;
     private JButton nextPageButton;
-    private ArrayList<Double> xData;
-    private ArrayList<Double> yData;
     private  JPanel upperPanel;
     private ArrayList<Integer> selectedButtons;
     private List<List<Double>> dataLists;
@@ -46,9 +44,6 @@ public class SelectionScreenFrame extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
-
-        //ExcelReading.getInstance().readExcelData(EnterenceScreenFrame.getInstance().getFilePath());
-       // buttonCount=ExcelReading.getInstance().getColumnCount();
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -261,19 +256,14 @@ public class SelectionScreenFrame extends JFrame {
 
 
     private void updateAxisButtonsVisibility() {
-        // graphButton3 görünürlüğü: counterY 0 olacak ve counterX en az 1 olacak
         graphButton3.setVisible(counterY == 0 && counterX >= 1);
 
-        // graphButton4 görünürlüğü: counterX veya counterY en az 1 olacak
-        graphButton4.setVisible(counterX >= 1 || counterY >= 1);
+        graphButton4.setVisible(counterY == 0 && counterX >= 1);
 
-        // graphButton1 görünürlüğü: sadece counterX 1 ve counterY 1 olacak
         graphButton1.setVisible(counterX == 1 && counterY == 1);
 
-        // graphButton2 görünürlüğü: counterY 0 olacak ve counterX en az 1, en fazla 3 olacak
-        graphButton2.setVisible(counterY == 0 && counterX >= 1 && counterX <= 3);
+        graphButton2.setVisible(counterX == 1 && counterY == 1);
 
-        // graphButton1 ve graphButton2 için butonlar seçiliyse işlem yapma
         if (!graphButton1.isVisible() && graphButton1.isSelected()) {
             graphButton1.setSelected(false);
             graphButton1.setForeground(Color.BLACK);
@@ -295,11 +285,9 @@ public class SelectionScreenFrame extends JFrame {
 
 
     private void updateGraphsButtonVisibility() {
-        // counterGraph 1 veya 1'den büyükse nextPageButton görünür olacak
         boolean isVisible = counterGraph >= 1;
         nextPageButton.setVisible(isVisible);
 
-        // Eğer nextPageButton görünür değilse, metin rengini siyah yap
         if (!isVisible && nextPageButton.isSelected()) {
             nextPageButton.setSelected(false);
             nextPageButton.setForeground(Color.BLACK);
@@ -351,16 +339,6 @@ public class SelectionScreenFrame extends JFrame {
         return selectedButtons;
     }
 
-
-
-    public ArrayList<Double> getxData() {
-        return xData;
-    }
-
-    public ArrayList<Double> getyData() {
-        return yData;
-    }
-
     public void updateButtons() {
         ExcelReading.getInstance().readExcelData(EnterenceScreenFrame.getInstance().getFilePath());
         int buttonCount = ExcelReading.getInstance().getColumnCount();
@@ -399,7 +377,7 @@ public class SelectionScreenFrame extends JFrame {
         locationY=0;
 
         if(ExcelReading.getInstance().isFirstColumnIsString()){
-            buttonCount--;//buna bi dikkat et hata verebilir
+            buttonCount--;
         }
 
         for (int i = 0; i < buttonCount; i++) {

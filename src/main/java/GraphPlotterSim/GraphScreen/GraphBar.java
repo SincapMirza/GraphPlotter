@@ -14,7 +14,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GraphBar extends JFrame {
+public class GraphBar extends JFrame implements GraphInterface{
     private List<List<Double>> dataLists;
     private ChartPanel chartPanel;
 
@@ -30,8 +30,8 @@ public class GraphBar extends JFrame {
         List<String> listOfHeaders = ExcelReading.getInstance().getColumnHeaders2();
 
         if (dataLists.size() == 1) {
-            // Iterate through each row and add its value as a separate bar
-            List<Double> row = dataLists.get(0); // Get the single list
+            // tek sütun seçildiyse her satırı tek tek dolaşıp değerlerini farklı çubuklara atama
+            List<Double> row = dataLists.get(0);
             for (int j = 0; j < row.size(); j++) {
                 Double value = row.get(j);
 
@@ -45,7 +45,7 @@ public class GraphBar extends JFrame {
                 }
             }
         } else {
-            // Sum up the values of each dataset if there are multiple columns selected
+            // birden fazla süütun seçili ise sütunları toplama
             if(ExcelReading.getInstance().isFirstColumnIsString()){
                 ArrayList<Integer> selectedButtons = SelectionScreenFrame.getInstance().getSelectedAxisButtons();
                 for(int a = 0; a < selectedButtons.size();a++){
@@ -88,12 +88,10 @@ public class GraphBar extends JFrame {
         plot.getDomainAxis().setLabelPaint(Color.BLACK);
         plot.getRangeAxis().setLabelPaint(Color.BLACK);
 
-
        plot.getRenderer().setSeriesPaint(0, Color.darkGray);
 
-
         chartPanel = new ChartPanel(chart);
-        //chartPanel.setPreferredSize(new Dimension(700, 400));
+
         setContentPane(chartPanel);
     }
 

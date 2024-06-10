@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-// E-posta gönderme işlemini gerçekleştirecek Thread sınıfı
 class EmailSenderThread extends Thread {
     private String recipient;
     private String subject;
@@ -42,7 +41,7 @@ class EmailSenderThread extends Thread {
 
             // E-posta göndermek için gerekli olan bilgiler
             String username = "graphplotter.mnm@gmail.com"; // Gönderici e-posta adresi
-            String password = "wjss xmvz mxmd yhxb"; // Gönderici e-posta şifresi
+            String password = "wjss xmvz mxmd yhxb"; // Gönderici geçiş anahtarı
             String host = "smtp.gmail.com"; // Gmail SMTP sunucusu
             int port = 587; // E-posta sunucusu port numarası
 
@@ -105,7 +104,7 @@ class EmailSenderThread extends Thread {
                 Transport.send(message);
 
                 // Başarılı mesajı gösterme
-                JOptionPane.showMessageDialog(GraphScreenFrame.getInstance(), "E-posta başarıyla gönderildi!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(GraphScreenFrame.getInstance(), "The email has been sent successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
                 // Dosyaları temizleme
                 for (int i = 0; i < graphPanels.size(); i++) {
@@ -114,7 +113,7 @@ class EmailSenderThread extends Thread {
                 }
             } catch (MessagingException | IOException e) {
                 // Hata mesajını gösterme
-                JOptionPane.showMessageDialog(GraphScreenFrame.getInstance(), "E-posta gönderilirken bir hata oluştu: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(GraphScreenFrame.getInstance(), "An error occurred while sending the email: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
         }

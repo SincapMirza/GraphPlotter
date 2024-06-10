@@ -4,7 +4,6 @@ import GraphPlotterSim.SelectionScreen.SelectionScreenFrame;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,19 +12,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
-public class EnterenceScreenFrame extends JFrame {
+public class EnterenceScreenFrame extends JFrame  {
 
     private String filePath;
 
     private static EnterenceScreenFrame enterenceScreenFrame;
 
     private EnterenceScreenFrame() {
-        setTitle("Fixed Size Frame");
+        setTitle("Graph Plotter");
         setSize(1300, 800);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-
-        //setResizable(false); // Pencere boyutunu değiştirmeyi devre dışı bırakır
 
         // "Welcome To Graph Plotter" yazısı
         JLabel label = new JLabel("Welcome To Graph Plotter");
@@ -46,7 +43,29 @@ public class EnterenceScreenFrame extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 JOptionPane optionPane = new JOptionPane();
-                optionPane.setMessage("How to use?\nFirst, upload your Excel file. Then, select which variables you want to plot in which chart, and your graph is ready.:)");
+                optionPane.setMessage("How to Use:\n" +
+                        "Database Upload:\n" +
+                        "Click the \"Upload File\" button to select an Excel file. Ensure that your Excel-based database is properly prepared.\n\n" +
+                        "Creating the Database Correctly:\n" +
+                        "For the program to function correctly, the first row of your database must consist of headers (Optionally, the first column can also consist of headers).\n" +
+                        "Values other than headers should be numerical and should not contain letters or symbols.\n\n" +
+                        "Selecting Variables:\n" +
+                        "If you have completed the database operations correctly, your variables will appear.\n" +
+                        "Your variables are extracted from the headers in the rows (Headers in the first column are not selected as variables and will be used as titles only in pie and column charts if only one variable is selected.).\n" +
+                        "By selecting from these variables, you can create your graphs.\n\n" +
+                        "Things to Consider When Selecting Variables:\n" +
+                        "If you select one x-axis and one y-axis variable, you can create X-Y and Scatter Plot graphs.\n" +
+                        "If you select one or more x variables, you can create Pie and Bar charts.\n\n" +
+                        "Creating an X-Y Graph:\n" +
+                        "When creating an X-Y graph, the variable selected in the y-axis button will be passed to the y-axis, and the variable selected in the x-axis button will be passed to the x-axis.\n\n" +
+                        "Creating a Scatter Plot Graph:\n" +
+                        "When creating a Scatter Plot graph, the variable selected in the y-axis button will be passed to the y-axis, and the variable selected in the x-axis button will be passed to the x-axis.\n\n" +
+                        "Creating Pie and Bar Charts:\n" +
+                        "If you are creating Pie and Bar charts and select an x button variable, it will fetch your headers from the first column and create your graphs by separating them row by row.\n" +
+                        "If more than one x button variable is selected, the values under the columns will be summed up, and the headers from the first row will be shown as titles.\n\n" +
+                        "Sending e-mail:\n" +
+                        "When you select the Send E-mail checkbox at the bottom right corner of the screen where you select your variables, you will encounter an email entry screen.\n" +
+                        "If you enter your email here, your graphs will be sent to you as PNG images via email.");
                 optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
 
                 String title = "How to use";
@@ -58,12 +77,12 @@ public class EnterenceScreenFrame extends JFrame {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                label2.setForeground(Color.BLUE); // Mouse üzerine gelince yazı rengini mavi yapar
+                label2.setForeground(Color.BLUE); // Mouse üzerine gelince yazı rengini mavi yap
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                label2.setForeground(Color.BLACK); // Mouse üzerinden çıkınca yazı rengini tekrar siyah yapar
+                label2.setForeground(Color.BLACK); // Mouse üzerinden çıkınca yazı rengini tekrar siyah yap
             }
         });
 
@@ -79,18 +98,13 @@ public class EnterenceScreenFrame extends JFrame {
         mainPanel.add(innerpanel);
         mainPanel.add(innerpanel2);
 
-        // Ana paneli frame'e ekleyin
-
-
         JButton fileButton = new JButton("Upload File");
         fileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel files (*.xls, *.xlsx)", "xls", "xlsx");
-                fileChooser.addChoosableFileFilter(filter); // Excel dosyaları için filtre eklendi
-                filter = new FileNameExtensionFilter("CSV files (*.csv)", "csv");
-                fileChooser.addChoosableFileFilter(filter); // CSV dosyaları için filtre eklendi
+                fileChooser.addChoosableFileFilter(filter); // Excel dosyaları için filtre ekleme
 
                 int result = fileChooser.showOpenDialog(EnterenceScreenFrame.this);
                 if (result == JFileChooser.APPROVE_OPTION) {
@@ -100,19 +114,15 @@ public class EnterenceScreenFrame extends JFrame {
                     String fileType = "";
                     if (filePath.endsWith(".xls") || filePath.endsWith(".xlsx")) {
                         fileType = "Excel file: ";
-                    } else if (filePath.endsWith(".csv")) {
-                        fileType = "CSV file: ";
-                        System.out.println("sa");
-                    } else {
-                        JOptionPane.showMessageDialog(EnterenceScreenFrame.this, "Unsupported file type. Please select an Excel or CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
-                        return; // Hata mesajı gösterildikten sonra metodu sonlandır
+                    }else {
+                        JOptionPane.showMessageDialog(EnterenceScreenFrame.this, "Unsupported file type. Please select an Excel file.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return; // Hata mesajı gösterildikten sonra metodu sonlandırma
                     }
                     System.out.println(fileType + filePath);
 
                     SelectionScreenFrame frame = SelectionScreenFrame.getInstance();
                     frame.setVisible(true);
 
-                    // Yeni bir dosya seçildiğinde, SelectionScreenFrame'deki butonları güncelle
                     frame.updateButtons();
                 }
             }
@@ -127,8 +137,6 @@ public class EnterenceScreenFrame extends JFrame {
         buttonPanel.add(fileButton);
 
         buttonPanel.setBorder(new EmptyBorder(130, 0, 0, 0));
-
-       // getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
         innerpanel2.add(buttonPanel);
 
@@ -151,12 +159,12 @@ public class EnterenceScreenFrame extends JFrame {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                label3.setForeground(Color.BLUE); // Mouse üzerine gelince yazı rengini mavi yapar
+                label3.setForeground(Color.BLUE); // Mouse üzerine gelince yazı rengini mavi yapma
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                label3.setForeground(Color.BLACK); // Mouse üzerinden çıkınca yazı rengini tekrar siyah yapar
+                label3.setForeground(Color.BLACK); // Mouse üzerinden çıkınca yazı rengini tekrar siyah yapma
             }
         });
 

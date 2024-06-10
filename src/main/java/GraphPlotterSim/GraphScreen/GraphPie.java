@@ -14,9 +14,9 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class GraphPie extends JFrame {
+
+public class GraphPie extends JFrame implements GraphInterface{
     private List<List<Double>> dataLists;
     private ChartPanel chartPanel;
     private List<String> labels;
@@ -37,8 +37,8 @@ public class GraphPie extends JFrame {
 
 
         if (dataLists.size() == 1 && labels != null) {
-            // Iterate through each row and add its value as a separate bar
-            List<Double> row = dataLists.get(0); // Get the single list
+            //tek sütun seçili ise değerleri tek tek satırlardan çekme
+            List<Double> row = dataLists.get(0);
             for (int j = 0; j < row.size(); j++) {
                 Double value = row.get(j);
 
@@ -50,7 +50,7 @@ public class GraphPie extends JFrame {
                 }
             }
         }else if (labels == null && dataLists.size() == 1){
-            List<Double> row = dataLists.get(0); // Get the single list
+            List<Double> row = dataLists.get(0);
             for (int j = 0; j < row.size(); j++) {
                 Double value = row.get(j);
                 dataset.setValue("Data " + (j + 1), value);
@@ -62,7 +62,7 @@ public class GraphPie extends JFrame {
             for(int a = 0; a < selectedButtons.size();a++){
                 selectedButtons.set(a,selectedButtons.get(a)-1);
             }
-            // Sum up the values of each dataset if there are multiple columns selected
+            //1 den fazla sütun seçili ise satırları toplama
             for (int i = 0; i < dataLists.size(); i++) {
                 double sum = dataLists.get(i).stream().filter(d -> !d.isNaN()).mapToDouble(Double::doubleValue).sum();
                 String header = ExcelReading.getInstance().getColumnHeaders().get(selectedButtons.get(i));
@@ -80,7 +80,7 @@ public class GraphPie extends JFrame {
         JFreeChart chart = ChartFactory.createPieChart(
                 "Pie Chart",
                 dataset,
-                true, // include legend
+                true,
                 true,
                 false);
 
@@ -88,7 +88,7 @@ public class GraphPie extends JFrame {
         plot.setBackgroundPaint(Color.WHITE);
         plot.setOutlinePaint(Color.BLACK);
 
-        // Set pie section colors dynamically if needed
+        // dilim renklerini belirleme
         Color[] colors = {Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW, Color.ORANGE, Color.CYAN, Color.MAGENTA};
         for (int i = 0; i < dataLists.size(); i++) {
             plot.setSectionPaint("Data " + (i + 1), colors[i % colors.length]);
@@ -99,7 +99,6 @@ public class GraphPie extends JFrame {
 
 
         chartPanel = new ChartPanel(chart);
-        //chartPanel.setPreferredSize(new Dimension(700, 400));
     }
 
     public ChartPanel getChartPanel() {
