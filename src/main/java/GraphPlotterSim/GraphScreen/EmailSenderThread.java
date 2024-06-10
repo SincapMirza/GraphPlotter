@@ -40,8 +40,8 @@ class EmailSenderThread extends Thread {
     private void sendEmail(String recipient, String subject, String body, List<JPanel> graphPanels) {
 
             // E-posta göndermek için gerekli olan bilgiler
-            String username = "graphplotter.mnm@gmail.com"; // Gönderici e-posta adresi
-            String password = "wjss xmvz mxmd yhxb"; // Gönderici geçiş anahtarı
+            String username = ""; // Gönderici e-posta adresi
+            String password = ""; // Gönderici geçiş anahtarı
             String host = "smtp.gmail.com"; // Gmail SMTP sunucusu
             int port = 587; // E-posta sunucusu port numarası
 
